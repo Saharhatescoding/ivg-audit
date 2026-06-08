@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IVG — Email, SMS &amp; Retention Audit</title>
+<style>
+  :root{ --ink:#15171c; --mut:#737880; --faint:#a0a5ac; --line:#e7e6e2; --grid:#efeee9; --bg:#eceae6; --card:#fff; --sal:#fb5c6d; --saltint:#ffe9ec; --saldeep:#c0263b; --pos:#1f9d63; --postint:#e4f4ec; --amber:#bb8a1e; --blue:#3a7bd5; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:16px/1.65 "Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;padding:48px 16px}
+  .paper{max-width:840px;margin:0 auto;background:var(--card);border-radius:8px;padding:68px 70px 84px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+  .brand{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);font-weight:800}
+  h1{font-size:29px;line-height:1.2;letter-spacing:-.01em;font-weight:800;margin:14px 0 0}
+  .meta{font-size:13px;color:var(--mut);margin-top:10px}
+  .lede{font-size:17px;line-height:1.62;margin:26px 0 0;color:#23262c}
+  .lede b{color:var(--ink)}
+  .part{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--sal);font-weight:800;margin:60px 0 0;padding-bottom:8px;border-bottom:2px solid var(--ink)}
+  h2{font-size:20px;line-height:1.3;font-weight:800;margin:48px 0 0;letter-spacing:-.01em}
+  h2:first-of-type{margin-top:32px}
+  h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:800;margin:30px 0 0}
+  p{margin:13px 0 0} .sub{color:var(--mut);font-size:13.5px;margin-top:4px}
+  ul{margin:12px 0 0;padding-left:0;list-style:none}
+  li{margin:10px 0;padding-left:24px;position:relative}
+  li::before{content:"";position:absolute;left:3px;top:10px;width:7px;height:7px;border-radius:50%;background:var(--ink)}
+  li.up::before{background:var(--pos)} li.down::before{background:var(--sal)}
+  b.n{font-variant-numeric:tabular-nums}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:18px 0 0}
+  th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line);vertical-align:baseline}
+  th{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:800}
+  td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
+  tr.tot td{border-top:2px solid var(--ink);font-weight:800}
+  tr.bad td:first-child{color:var(--sal);font-weight:700}
+  tr:hover td{background:#faf9f6}
+  .bar{display:flex;align-items:center;gap:11px;margin:7px 0;font-size:12.5px}
+  .bar .nm{width:200px;flex:none;text-align:right;color:var(--ink)}
+  .bar .tk{flex:1;background:var(--grid);border-radius:4px;height:20px;overflow:hidden}
+  .bar .fl{height:100%;background:var(--ink);border-radius:4px}
+  .bar .fl.sal{background:var(--sal)} .bar .fl.pos{background:var(--pos)}
+  .bar .vl{width:120px;flex:none;color:var(--mut);font-variant-numeric:tabular-nums}
+  .chart{margin-top:18px;border:1px solid var(--line);border-radius:8px;padding:16px 16px 10px}
+  .chart .ttl{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:800;margin-bottom:6px}
+  .lg{display:flex;gap:16px;font-size:11px;color:var(--mut);margin-bottom:6px}
+  .lg i{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin-right:4px}
+  .act{margin-top:15px;padding:13px 17px;background:#faf9f6;border-left:3px solid var(--sal);border-radius:0 6px 6px 0;font-size:14.5px}
+  .act b{color:var(--saldeep)}
+  .waffle{display:grid;grid-template-columns:repeat(25,1fr);gap:3px;margin-top:16px;max-width:520px}
+  .waffle i{aspect-ratio:1;border-radius:2px;background:#e6e5e1}
+  .waffle i.on{background:var(--sal)}
+  .wide{width:100vw;position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;padding:0 28px}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+  .ec{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .ec .img{height:340px;width:100%;object-fit:cover;object-position:top;display:block;background:#f4f3ef}
+  .ec .body{padding:12px 13px}
+  .ec .nm{font-size:13px;font-weight:700;line-height:1.3}
+  .ec .subj{font-size:11.5px;font-style:italic;color:var(--mut);margin-top:3px;min-height:28px}
+  .ec .chips{display:flex;flex-wrap:wrap;gap:5px;margin:9px 0}
+  .ec .chip{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;border:1px solid var(--line);color:var(--mut)}
+  .ec .chip.offer{border-color:var(--sal);background:var(--saltint);color:var(--saldeep)}
+  .ec .stat{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-top:1px solid var(--line);font-size:12px}
+  .ec .stat .l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--faint)}
+  .ec .stat .v{font-weight:700;font-variant-numeric:tabular-nums}
+  .foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;line-height:1.6;color:var(--mut)}
+  .tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:4px}
+  .tag.r{background:var(--saltint);color:var(--saldeep)} .tag.g{background:var(--postint);color:#177a4c} .tag.a{background:#fbf0d8;color:#8a6610}
+  .cap{font-size:12px;color:var(--faint);margin-top:8px}
+  .gm{font-size:13.5px;margin-top:6px}
+  .gm .row{display:flex;align-items:baseline;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}
+  .gm .s{width:78px;flex:none;font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:.03em}
+  .gm .s.ok{color:var(--pos)} .gm .s.warn{color:var(--amber)} .gm .s.miss{color:var(--sal)}
+  svg{display:block;width:100%;height:auto;font-family:inherit}
+  svg text{font-size:10px;fill:var(--faint)}
+  rect[data-tip],circle[data-tip],.bar[data-tip]{cursor:pointer}
+  .heat{border-collapse:separate;border-spacing:2px;width:100%;margin-top:16px;font-variant-numeric:tabular-nums}
+  .heat th{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;color:var(--faint);padding:5px 2px;text-align:center}
+  .heat th:first-child,.heat td:first-child{text-align:left}
+  .heat td{font-size:10.5px;padding:6px 2px;text-align:center;border-radius:3px;background:#faf9f6}
+  .heat .ch{font-weight:700;font-size:10.5px;white-space:nowrap}
+  .heat .sz{color:var(--mut);font-size:9.5px}
+</style>
+</head>
+<body>
+<div class="paper">
+
+  <div class="brand">The Donut Agency</div>
+  <h1>IVG — Email, SMS &amp; Retention Audit</h1>
+  <div class="meta">I Vape Great · ivapegreat.com · June 2026 · GBP · full order history Sep 2022 – Jun 2026 (142,644 orders · 50,153 customers) · charts are interactive — hover for exact figures</div>
+
+  <p class="lede">Email drives 28% of IVG's revenue, and it is <b>heavily reliant on campaigns</b> (81% campaigns, 19% flows), produced by sending three campaigns a week to a single segment. The order data shows a tight, consumable reorder pattern: 41% of customers buy again, on a <b>median 24–25 day cycle</b>, and when they return they overwhelmingly rebuy the same format. The flows that would meet that cycle, winback and replenishment, do not exist, and ~1,300 customers a quarter are reactivating with no email helping them. Building those flows, deploying the segments that already exist, and recovering Microsoft deliverability is the program's largest near-term lever. This audit reports only what the Klaviyo account and its order data show.</p>
+
+  <!-- ============ PART A ============ -->
+  <div class="part">Part A — Email &amp; SMS</div>
+
+  <h2>Email is 28% of revenue; campaigns carry it</h2>
+  <div class="bar" data-tip="Campaigns: £450K / yr · 81% of email revenue" style="margin-top:18px"><div class="nm">Campaigns</div><div class="tk"><div class="fl" style="width:81%"></div></div><div class="vl">£450K · 81%</div></div>
+  <div class="bar" data-tip="Flows: £103K / yr · 19% of email revenue"><div class="nm">Flows</div><div class="tk"><div class="fl sal" style="width:19%"></div></div><div class="vl">£103K · 19%</div></div>
+  <p>Store revenue <b class="n">£1.96M</b>; email <b class="n">£553K</b> (28%, Klaviyo last-touch). The split is a reliance description: the program leans on campaigns, the automated layer is light. AOV £33.</p>
+
+  <h2>Sends scaled over the year; unique openers did not</h2>
+  <div class="chart">
+    <div class="ttl">Monthly email sends vs unique openers · last 12 months</div>
+    <div class="lg"><span><i style="background:#cfcec8"></i>Sends (left axis)</span><span><i style="background:#fb5c6d"></i>Unique openers (right axis)</span></div>
+    <svg viewBox="0 0 720 224" role="img">
+      <!-- gridlines + left axis (sends 0-400K) -->
+      <g stroke="var(--grid)" stroke-width="1"><line x1="44" y1="204" x2="690" y2="204"/><line x1="44" y1="156" x2="690" y2="156"/><line x1="44" y1="108" x2="690" y2="108"/><line x1="44" y1="60" x2="690" y2="60"/><line x1="44" y1="12" x2="690" y2="12"/></g>
+      <g text-anchor="end"><text x="40" y="207">0</text><text x="40" y="159">100K</text><text x="40" y="111">200K</text><text x="40" y="63">300K</text><text x="40" y="15">400K</text></g>
+      <!-- right axis (openers 0-30K) -->
+      <g text-anchor="start" fill="#fb5c6d"><text x="694" y="207">0</text><text x="694" y="143">10K</text><text x="694" y="79">20K</text><text x="694" y="15">30K</text></g>
+      <!-- sends bars -->
+      <g fill="#cfcec8">
+        <rect x="53" y="190.5" width="34" height="13.5" data-tip="Jun '25 — 28,213 sends"/>
+        <rect x="106" y="158.3" width="34" height="45.7" data-tip="Jul '25 — 95,150 sends"/>
+        <rect x="159" y="190.9" width="34" height="13.1" data-tip="Aug '25 — 27,321 sends"/>
+        <rect x="212" y="144.8" width="34" height="59.2" data-tip="Sep '25 — 123,344 sends"/>
+        <rect x="265" y="121.1" width="34" height="82.9" data-tip="Oct '25 — 172,650 sends"/>
+        <rect x="318" y="73.9" width="34" height="130.1" data-tip="Nov '25 — 271,098 sends"/>
+        <rect x="371" y="28.6" width="34" height="175.4" data-tip="Dec '25 — 365,448 sends"/>
+        <rect x="424" y="115.4" width="34" height="88.6" data-tip="Jan '26 — 184,683 sends"/>
+        <rect x="477" y="102.7" width="34" height="101.3" data-tip="Feb '26 — 211,008 sends"/>
+        <rect x="530" y="12.3" width="34" height="191.7" data-tip="Mar '26 — 399,358 sends"/>
+        <rect x="583" y="59.3" width="34" height="144.7" data-tip="Apr '26 — 301,553 sends"/>
+        <rect x="636" y="51.1" width="34" height="152.9" data-tip="May '26 — 318,646 sends"/>
+      </g>
+      <!-- openers line + points -->
+      <polyline fill="none" stroke="#fb5c6d" stroke-width="2.5" points="70,152 123,130 176,142 229,119 282,115 335,110 388,106 441,116 494,115 547,36 600,62 653,64"/>
+      <g fill="#fb5c6d">
+        <circle cx="70" cy="152" r="3.5" data-tip="Jun '25 — 8,116 openers (28.8% per-send)"/>
+        <circle cx="123" cy="130" r="3.5" data-tip="Jul '25 — 11,615 openers"/>
+        <circle cx="176" cy="142" r="3.5" data-tip="Aug '25 — 9,712 openers"/>
+        <circle cx="229" cy="119" r="3.5" data-tip="Sep '25 — 13,283 openers"/>
+        <circle cx="282" cy="115" r="3.5" data-tip="Oct '25 — 13,876 openers"/>
+        <circle cx="335" cy="110" r="3.5" data-tip="Nov '25 — 14,634 openers"/>
+        <circle cx="388" cy="106" r="3.5" data-tip="Dec '25 — 15,316 openers"/>
+        <circle cx="441" cy="116" r="3.5" data-tip="Jan '26 — 13,835 openers"/>
+        <circle cx="494" cy="115" r="3.5" data-tip="Feb '26 — 13,856 openers"/>
+        <circle cx="547" cy="36" r="3.5" data-tip="Mar '26 — 26,242 openers"/>
+        <circle cx="600" cy="62" r="3.5" data-tip="Apr '26 — 22,192 openers"/>
+        <circle cx="653" cy="64" r="3.5" data-tip="May '26 — 21,883 openers"/>
+      </g>
+      <g text-anchor="middle"><text x="70" y="219">Jun</text><text x="229" y="219">Sep</text><text x="388" y="219">Dec</text><text x="547" y="219">Mar</text><text x="653" y="219">May</text></g>
+    </svg>
+  </div>
+  <p>Sends rose from ~28K to a peak of ~399K a month; unique openers held in a band of ~8K–26K. Per-send open rate to the engaged segment stays healthy (45–53%); the divergence is a volume signal.</p>
+
+  <h2>Deliverability: Microsoft is the weak inbox</h2>
+  <p>A clean, controlled read: the same offer sent to Outlook addresses opened at <b class="n">18.6%</b> versus <b class="n">43%</b> to everyone else — same day, same creative, only the audience differed. Monthly sends to Microsoft were then cut from 64,600 (Mar) to 5,000 (May) as a "Hotmail &amp; Outlook" segment was excluded. Send volume by inbox provider, last 90 days:</p>
+  <table>
+    <tr><th>Inbox provider</th><th class="r">Sends (90d)</th><th>Note</th></tr>
+    <tr><td>Gmail</td><td class="r">605,754</td><td></td></tr>
+    <tr><td>Apple Mail</td><td class="r">137,116</td><td></td></tr>
+    <tr><td>Yahoo / AOL (Verizon)</td><td class="r">114,921</td><td></td></tr>
+    <tr class="bad"><td>Hotmail / Outlook</td><td class="r">87,264</td><td>Suppressed; falling (64K→5K Mar→May)</td></tr>
+    <tr><td>BT Internet</td><td class="r">14,010</td><td></td></tr>
+    <tr><td>Office 365</td><td class="r">10,705</td><td></td></tr>
+    <tr><td>Gsuite</td><td class="r">4,655</td><td></td></tr>
+  </table>
+  <p class="cap">Per-send open and click rate by domain is Klaviyo's "deliverability by domain" UI card. It cannot be reproduced cleanly via the aggregates API: the API returns unique openers over the window (one count per person regardless of how many campaigns they received), divided by total send events — which is not a per-send open rate. The controlled A/B comparison above (18.6% vs 43%) is the correct deliverability signal for Microsoft.</p>
+  <div class="act"><b>Recover the Microsoft sender reputation, then re-warm it.</b> Excluding an inbox provider is a workaround, not a fix.</div>
+
+  <h2>List growth and sign-up sources</h2>
+  <p>The list is growing: <b class="n">+56%</b> over Jan–Jun 2026 (1,274 new subscribers, 225 exclusions, net +1,049). New subscribers per month:</p>
+  <div class="chart">
+    <div class="ttl">New email subscribers per month · last 12 months</div>
+    <svg viewBox="0 0 720 150" role="img">
+      <g stroke="var(--grid)" stroke-width="1"><line x1="44" y1="126" x2="700" y2="126"/><line x1="44" y1="69" x2="700" y2="69"/><line x1="44" y1="12" x2="700" y2="12"/></g>
+      <g text-anchor="end"><text x="40" y="129">0</text><text x="40" y="72">350</text><text x="40" y="15">700</text></g>
+      <polyline fill="none" stroke="#1f9d63" stroke-width="2.5" points="44,103 102,106 160,109 217,106 275,15 333,96 391,107 449,108 506,107 564,65 622,65 680,53"/>
+      <g fill="#1f9d63">
+        <circle cx="44" cy="103" r="3.5" data-tip="Jun '25 — 142 new"/><circle cx="102" cy="106" r="3.5" data-tip="Jul '25 — 123"/><circle cx="160" cy="109" r="3.5" data-tip="Aug '25 — 105"/><circle cx="217" cy="106" r="3.5" data-tip="Sep '25 — 125"/><circle cx="275" cy="15" r="3.5" data-tip="Oct '25 — 680"/><circle cx="333" cy="96" r="3.5" data-tip="Nov '25 — 186"/><circle cx="391" cy="107" r="3.5" data-tip="Dec '25 — 116"/><circle cx="449" cy="108" r="3.5" data-tip="Jan '26 — 109"/><circle cx="506" cy="107" r="3.5" data-tip="Feb '26 — 117"/><circle cx="564" cy="65" r="3.5" data-tip="Mar '26 — 375"/><circle cx="622" cy="65" r="3.5" data-tip="Apr '26 — 377"/><circle cx="680" cy="53" r="3.5" data-tip="May '26 — 450"/>
+      </g>
+      <g text-anchor="middle"><text x="44" y="144">Jun</text><text x="275" y="144">Oct</text><text x="449" y="144">Jan</text><text x="680" y="144">May</text></g>
+    </svg>
+  </div>
+  <p>Sign-ups come from essentially one form. Forms with more than one sign-up in the last 90 days:</p>
+  <table>
+    <tr><th>Form</th><th class="r">Views</th><th class="r">Sign-ups</th><th class="r">Sign-up rate</th></tr>
+    <tr><td>Pop-up <span class="cap">(form XRVC9Q)</span></td><td class="r">71,745</td><td class="r">7,631</td><td class="r">10.6%</td></tr>
+    <tr class="tot"><td>All other forms</td><td class="r">—</td><td class="r">0</td><td class="r">—</td></tr>
+  </table>
+  <div class="act"><b>Add a second capture path.</b> Growth resting on one form is a single point of failure.</div>
+
+  <h2>List reach: emailable customers going dark</h2>
+  <p>Of customers who can receive email, how many were not sent any in the window. The 30-day gap is the live concern; the 90/180-day silent counts are small (a subset of the 30-day group).</p>
+  <table>
+    <tr><th>Emailable customers not sent an email in…</th><th class="r">Customers</th></tr>
+    <tr class="bad"><td>last 30 days</td><td class="r">10,419</td></tr>
+    <tr><td>last 90 days</td><td class="r">1,240</td></tr>
+    <tr><td>last 180 days</td><td class="r">1,237</td></tr>
+    <tr class="tot"><td>All customers who can receive email</td><td class="r">78,572</td></tr>
+  </table>
+  <div class="waffle" data-tip="10,419 of 78,572 emailable customers (~13%) were not sent an email in the last 30 days">
+    <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+  </div>
+  <p class="cap">Each square ≈ 1% of emailable customers; shaded ≈ 13% unreached in the last 30 days.</p>
+
+  <h2>Campaigns: cadence, content, segments</h2>
+  <p>About <b class="n">3 sends a week</b>; campaign revenue is <b class="n">£450K</b> (23% of total revenue). Weekly volume vs revenue, last 90 days:</p>
+  <div class="chart">
+    <div class="ttl">Weekly sends vs revenue · last 90 days</div>
+    <div class="lg"><span><i style="background:#cfcec8"></i>Sends</span><span><i style="background:#3a7bd5"></i>Revenue</span></div>
+    <svg viewBox="0 0 720 168" role="img">
+      <g stroke="var(--grid)" stroke-width="1"><line x1="44" y1="146" x2="690" y2="146"/><line x1="44" y1="79" x2="690" y2="79"/><line x1="44" y1="12" x2="690" y2="12"/></g>
+      <g text-anchor="end"><text x="40" y="149">0</text><text x="40" y="82">90K</text><text x="40" y="15">180K</text></g>
+      <g text-anchor="start" fill="#3a7bd5"><text x="694" y="149">£0</text><text x="694" y="82">£11K</text><text x="694" y="15">£22K</text></g>
+      <g fill="#cfcec8">
+        <rect x="50" y="109.3" width="30" height="36.7" data-tip="wk Mar 2 — 49,336 sends · £12,971"/>
+        <rect x="99" y="15.9" width="30" height="130.1" data-tip="wk Mar 9 — 174,730 sends · £21,156"/>
+        <rect x="148" y="102.2" width="30" height="43.8" data-tip="wk Mar 16 — 58,844 sends · £7,824"/>
+        <rect x="197" y="80.5" width="30" height="65.5" data-tip="wk Mar 23 — 87,979 sends · £15,003"/>
+        <rect x="246" y="102.5" width="30" height="43.5" data-tip="wk Mar 30 — 58,385 sends · £10,375"/>
+        <rect x="295" y="102.3" width="30" height="43.7" data-tip="wk Apr 6 — 58,742 sends · £8,276"/>
+        <rect x="344" y="102" width="30" height="44" data-tip="wk Apr 13 — 59,067 sends · £10,344"/>
+        <rect x="393" y="72.5" width="30" height="73.5" data-tip="wk Apr 20 — 98,784 sends · £17,269"/>
+        <rect x="442" y="102.8" width="30" height="43.2" data-tip="wk Apr 27 — 58,025 sends · £9,340"/>
+        <rect x="491" y="73.1" width="30" height="72.9" data-tip="wk May 4 — 97,932 sends · £11,158"/>
+        <rect x="540" y="81.8" width="30" height="64.2" data-tip="wk May 11 — 86,269 sends · £11,940"/>
+        <rect x="589" y="103.2" width="30" height="42.8" data-tip="wk May 18 — 57,475 sends · £8,086"/>
+        <rect x="638" y="105.6" width="30" height="40.4" data-tip="wk May 25 — 54,213 sends · £8,320"/>
+      </g>
+      <polyline fill="none" stroke="#3a7bd5" stroke-width="2.5" points="65,67 114,17 163,98 212,55 261,83 310,96 359,83 408,41 457,89 506,78 555,73 604,97 653,95"/>
+      <g text-anchor="middle"><text x="65" y="162">Mar 2</text><text x="310" y="162">Apr 6</text><text x="555" y="162">May 11</text></g>
+    </svg>
+  </div>
+
+  <h3>Content analysis — every campaign, last 12 months</h3>
+  <table>
+    <tr><th>Email type</th><th class="r">Count</th><th class="r">Revenue</th><th class="r">Avg / campaign</th><th class="r">Click rate</th></tr>
+    <tr><td>Sale</td><td class="r">42</td><td class="r">£184,101</td><td class="r">£4,383</td><td class="r">1.6%</td></tr>
+    <tr><td>Product Launch</td><td class="r">16</td><td class="r">£68,847</td><td class="r">£4,303</td><td class="r">1.7%</td></tr>
+    <tr><td>Sale Last Chance</td><td class="r">14</td><td class="r">£63,111</td><td class="r">£4,508</td><td class="r">1.5%</td></tr>
+    <tr><td>Blog</td><td class="r">20</td><td class="r">£63,060</td><td class="r">£3,153</td><td class="r">1.3%</td></tr>
+    <tr><td>Multi-Product Spotlight</td><td class="r">4</td><td class="r">£16,887</td><td class="r">£4,222</td><td class="r">1.3%</td></tr>
+    <tr><td>Giveaway</td><td class="r">3</td><td class="r">£14,403</td><td class="r">£4,801</td><td class="r">0.9%</td></tr>
+    <tr><td>Black Friday</td><td class="r">3</td><td class="r">£11,688</td><td class="r">£3,896</td><td class="r">1.4%</td></tr>
+    <tr><td>Hype</td><td class="r">2</td><td class="r">£10,240</td><td class="r">£5,120</td><td class="r">1.8%</td></tr>
+    <tr><td>Sale Extension</td><td class="r">2</td><td class="r">£5,321</td><td class="r">£2,661</td><td class="r">3.0%</td></tr>
+    <tr><td>How-to · Press · Community · Statistics</td><td class="r">4</td><td class="r">£7,601</td><td class="r">—</td><td class="r">—</td></tr>
+    <tr class="tot"><td>110 campaigns</td><td class="r"></td><td class="r">~£445K</td><td class="r"></td><td class="r"></td></tr>
+  </table>
+  <p>Sale, Last Chance and Sale Extension are 58 of 110 campaigns (~£253K); in the last 90 days <b class="n">87%</b> of campaigns carried an offer. The mix leans promotional.</p>
+
+  <h3>Segment usage — verified from each campaign's audience</h3>
+  <p>Read directly from `audiences.included`: of 38 campaigns in 90 days, <b class="n">29</b> were sent to a segment named <b>"PJ Test Refined,"</b> 2 to "PJ Test," with "Hotmail &amp; Outlook Accounts" excluded on nearly all. The lifecycle segments that exist (Repeat Buyers, VIP Customers, Win-Back, Engaged 90-day) were used on <b>one</b> campaign. Production sends go to a test-named segment while the real segments sit unused.</p>
+
+  <h3>Top campaigns (last 90 days)</h3>
+  <div class="cards">
+    <div class="ec"><img class="img" src="ivg-c1.jpg" alt=""><div class="body"><div class="nm">3 for £10 — 2400</div><div class="subj">IVG 2400 3 for £10 is back!</div><div class="chips"><span class="chip">Sale</span><span class="chip offer">Offer</span></div><div class="stat"><span class="l">Recipients</span><span class="v">25,025</span></div><div class="stat"><span class="l">Open rate</span><span class="v">43.1%</span></div><div class="stat"><span class="l">Click rate</span><span class="v">3.3%</span></div><div class="stat"><span class="l">Revenue</span><span class="v">£10,451</span></div><div class="stat"><span class="l">Rev / recip.</span><span class="v">£0.42</span></div></div></div>
+    <div class="ec"><img class="img" src="ivg-c2.jpg" alt=""><div class="body"><div class="nm">20% off sitewide — Easter</div><div class="subj">Happy Easter from IVG - 20% Off Everything</div><div class="chips"><span class="chip">Sale</span><span class="chip offer">Offer</span></div><div class="stat"><span class="l">Recipients</span><span class="v">29,187</span></div><div class="stat"><span class="l">Open rate</span><span class="v">47.5%</span></div><div class="stat"><span class="l">Click rate</span><span class="v">1.7%</span></div><div class="stat"><span class="l">Revenue</span><span class="v">£7,657</span></div><div class="stat"><span class="l">Rev / recip.</span><span class="v">£0.26</span></div></div></div>
+    <div class="ec"><img class="img" src="ivg-c3.jpg" alt=""><div class="body"><div class="nm">Spring Sale 15% off everything</div><div class="subj">15% off EVERYTHING - Spring Sale Now On!</div><div class="chips"><span class="chip">Sale</span><span class="chip offer">Offer</span></div><div class="stat"><span class="l">Recipients</span><span class="v">28,984</span></div><div class="stat"><span class="l">Open rate</span><span class="v">50.9%</span></div><div class="stat"><span class="l">Click rate</span><span class="v">2.4%</span></div><div class="stat"><span class="l">Revenue</span><span class="v">£6,984</span></div><div class="stat"><span class="l">Rev / recip.</span><span class="v">£0.26</span></div></div></div>
+    <div class="ec"><img class="img" src="ivg-c4.jpg" alt=""><div class="body"><div class="nm">Spring Sale 15% + 5%</div><div class="subj">15% Off Everything + EXTRA 5% Off. Hurry!</div><div class="chips"><span class="chip">Sale</span><span class="chip offer">Offer</span></div><div class="stat"><span class="l">Recipients</span><span class="v">28,901</span></div><div class="stat"><span class="l">Open rate</span><span class="v">50.2%</span></div><div class="stat"><span class="l">Click rate</span><span class="v">2.3%</span></div><div class="stat"><span class="l">Revenue</span><span class="v">£6,602</span></div><div class="stat"><span class="l">Rev / recip.</span><span class="v">£0.25</span></div></div></div>
+    <div class="ec"><img class="img" src="ivg-c5.jpg" alt=""><div class="body"><div class="nm">Email exclusive — 20% off</div><div class="subj">Exclusive 20% Off – Just for You</div><div class="chips"><span class="chip">Sale</span><span class="chip offer">Offer</span></div><div class="stat"><span class="l">Recipients</span><span class="v">49,593</span></div><div class="stat"><span class="l">Open rate</span><span class="v">31.9%</span></div><div class="stat"><span class="l">Click rate</span><span class="v">1.4%</span></div><div class="stat"><span class="l">Revenue</span><span class="v">£6,487</span></div><div class="stat"><span class="l">Rev / recip.</span><span class="v">£0.13</span></div></div></div>
+  </div>
+
+  <h2>Flows: the repeat-purchase engine is missing</h2>
+  <p class="sub">All flows email-only. Revenue per recipient baseline £0.85, last 12 months.</p>
+  <table>
+    <tr><th>Flow</th><th class="r">Recipients</th><th class="r">Open</th><th class="r">Click</th><th class="r">Revenue</th><th class="r">RPR</th><th>Status</th></tr>
+    <tr><td>Checkout Abandoned</td><td class="r">60,322</td><td class="r">34.8%</td><td class="r">3.7%</td><td class="r">£55,233</td><td class="r">£0.94</td><td><span class="tag g">strong</span></td></tr>
+    <tr><td>Request Review</td><td class="r">41,742</td><td class="r">19.6%</td><td class="r">1.7%</td><td class="r">£32,998</td><td class="r">£0.81</td><td><span class="tag g">solid</span></td></tr>
+    <tr><td>Browse Abandonment</td><td class="r">13,035</td><td class="r">38.4%</td><td class="r">4.9%</td><td class="r">£10,425</td><td class="r">£0.83</td><td><span class="tag g">solid</span></td></tr>
+    <tr><td>Welcome (5 emails)</td><td class="r">2,933</td><td class="r">48.2%</td><td class="r">8.2%</td><td class="r">£3,061</td><td class="r">£1.06</td><td><span class="tag a">tapers</span></td></tr>
+    <tr><td>Browse Abandonment 5%</td><td class="r">2,534</td><td class="r">36.7%</td><td class="r">3.6%</td><td class="r">£1,186</td><td class="r">£0.53</td><td><span class="tag a">duplicate</span></td></tr>
+    <tr class="bad"><td>Basket Abandoned</td><td class="r">189</td><td class="r">21.3%</td><td class="r">4.4%</td><td class="r">£97</td><td class="r">£0.53</td><td><span class="tag r">broken</span></td></tr>
+    <tr class="bad"><td>Placed Order – Recommend More</td><td class="r">0</td><td class="r">—</td><td class="r">—</td><td class="r">£0</td><td class="r">—</td><td><span class="tag r">live, off</span></td></tr>
+    <tr class="tot"><td>Total live</td><td class="r">~120,800</td><td class="r"></td><td class="r"></td><td class="r">~£103,000</td><td class="r">£0.85</td><td></td></tr>
+  </table>
+
+  <h3>Coverage vs the canonical flow set</h3>
+  <div class="gm">
+    <div class="row"><span class="s ok">Live</span><span>Welcome · Checkout abandonment · Browse abandonment · Review request</span></div>
+    <div class="row"><span class="s warn">Broken</span><span>Cart abandonment (add-to-cart) — 189 recipients · Two overlapping browse flows · Welcome tail</span></div>
+    <div class="row"><span class="s warn">Off</span><span>Post-purchase / cross-sell ("Recommend More") — live but 0 sends</span></div>
+    <div class="row"><span class="s miss">Missing</span><span>Winback / replenishment · 1st→2nd order · 2nd→3rd order · Sunset · Back-in-stock · SMS in any flow</span></div>
+  </div>
+
+  <h3>Per-flow diagnostics</h3>
+  <p class="sub">Where the cause sits in something the report can't see (trigger, filter, delay, content), it is flagged as a verify-in-UI inference.</p>
+  <ul>
+    <li class="up"><b>Checkout Abandoned (£55K) and Request Review (£33K)</b> are the working flows. Keep; Checkout has good 6-message depth.</li>
+    <li class="down"><b>Basket Abandoned — broken.</b> 189 recipients in 12 months vs 60,322 for checkout. More shoppers add to cart than reach checkout, so this should rival checkout volume. <i>Inference: the add-to-cart trigger is mis-wired or the event isn't flowing — verify the trigger + exclusions in the UI.</i></li>
+    <li class="down"><b>"Recommend More" — built but off.</b> Live, 0 sends in 12 months. <i>Inference: disconnected trigger; the account has two "Placed Order" metrics (Shopify + WooCommerce), so it may be keyed to the wrong one — verify in the UI.</i></li>
+    <li class="down"><b>Two browse flows overlap.</b> "Browse Abandonment 5%" underperforms the main one (£0.53 vs £0.83 RPR, 89% vs 96% delivery). <i>Inference: a stale discount split — consolidate to one.</i></li>
+    <li class="down"><b>Welcome front-loads.</b> Email 1 earns £2.59/recipient; emails 3–5 earn £0.30. Rework the tail with objection/education content.</li>
+  </ul>
+
+  <h3>Dollar-weighted priorities</h3>
+  <table>
+    <tr><th>#</th><th>Build / fix</th><th>Why it ranks here</th><th>Sizing</th></tr>
+    <tr><td>1</td><td>Reconnect "Recommend More"</td><td>Already built; fix the trigger. Near-zero effort.</td><td class="r">post-purchase audience × attach% × £33 <span class="cap">[audience]</span></td></tr>
+    <tr><td>2</td><td>Build winback / replenishment, day 18–21</td><td>41% reorder on a 24–25d cycle; ~1,300/qtr reactivate unaided. Largest lever.</td><td class="r">lapsed-emailable × lift × £33 <span class="cap">[lapsed, lift]</span></td></tr>
+    <tr><td>3</td><td>Build a 2nd-order flow (first 30 days)</td><td>Where the drop-off concentrates (41% → 26%).</td><td class="r">first-time buyers × lift × £33</td></tr>
+    <tr><td>4</td><td>Fix the cart-abandon trigger</td><td>Should rival checkout volume; currently ~£0.</td><td class="r">add-to-cart audience × CR × £33</td></tr>
+    <tr><td>5</td><td>Consolidate browse · rework welcome tail · add sunset, back-in-stock · layer SMS</td><td>Hygiene + channel whitespace.</td><td class="r">incremental</td></tr>
+  </table>
+  <p class="cap"><b>What the flow report can't see:</b> trigger configuration, filter/exclusion logic, time delays, A/B splits, and email content (unless rendered), plus which of the two Placed Order metrics each flow is keyed to. Those need a UI pass to confirm the fixes above.</p>
+
+  <!-- ============ PART B ============ -->
+  <div class="part">Part B — Retention</div>
+
+  <h2>41% come back, on a 24–25 day cycle</h2>
+  <table>
+    <tr><th>Order step</th><th class="r">Customers</th><th class="r">% of base</th><th class="r">Median gap</th></tr>
+    <tr><td>1st → 2nd</td><td class="r">20,722</td><td class="r">41.3%</td><td class="r">24.1 days</td></tr>
+    <tr><td>2nd → 3rd</td><td class="r">13,145</td><td class="r">26.2%</td><td class="r">24.9 days</td></tr>
+    <tr><td>3rd → 4th</td><td class="r">9,485</td><td class="r">18.9%</td><td class="r">24.8 days</td></tr>
+    <tr><td>4th → 5th</td><td class="r">7,280</td><td class="r">14.5%</td><td class="r">—</td></tr>
+  </table>
+  <p class="cap">50,153 customers. Median gap is stable at ~24–25 days across steps; averages (48–65d) are dragged by a lapsed tail.</p>
+
+  <h2>Cohorts: LTV and retention soften as the base scales</h2>
+  <table>
+    <tr><th>Acq. quarter</th><th class="r">Cohort</th><th class="r">LTV 30d</th><th class="r">LTV 90d</th><th class="r">LTV 365d</th><th class="r">Active 3mo</th><th class="r">Active 12mo</th></tr>
+    <tr><td>2022 Q4</td><td class="r">1,758</td><td class="r">£39</td><td class="r">£57</td><td class="r">£104</td><td class="r">17.5%</td><td class="r">9.6%</td></tr>
+    <tr><td>2023 Q1</td><td class="r">1,978</td><td class="r">£43</td><td class="r">£64</td><td class="r">£113</td><td class="r">19.5%</td><td class="r">6.7%</td></tr>
+    <tr><td>2023 Q2</td><td class="r">1,778</td><td class="r">£43</td><td class="r">£62</td><td class="r">£100</td><td class="r">16.0%</td><td class="r">4.3%</td></tr>
+    <tr><td>2023 Q3</td><td class="r">2,717</td><td class="r">£43</td><td class="r">£61</td><td class="r">£94</td><td class="r">13.9%</td><td class="r">3.9%</td></tr>
+    <tr><td>2023 Q4</td><td class="r">2,941</td><td class="r">£42</td><td class="r">£58</td><td class="r">£88</td><td class="r">11.5%</td><td class="r">4.1%</td></tr>
+    <tr><td>2024 Q1</td><td class="r">3,008</td><td class="r">£45</td><td class="r">£57</td><td class="r">£87</td><td class="r">8.5%</td><td class="r">4.2%</td></tr>
+    <tr><td>2024 Q2</td><td class="r">1,838</td><td class="r">£52</td><td class="r">£70</td><td class="r">£108</td><td class="r">11.5%</td><td class="r">4.8%</td></tr>
+    <tr><td>2024 Q3</td><td class="r">3,748</td><td class="r">£45</td><td class="r">£61</td><td class="r">£95</td><td class="r">10.5%</td><td class="r">4.9%</td></tr>
+    <tr><td>2024 Q4</td><td class="r">3,280</td><td class="r">£40</td><td class="r">£54</td><td class="r">£81</td><td class="r">10.4%</td><td class="r">4.4%</td></tr>
+    <tr><td>2025 Q1</td><td class="r">4,181</td><td class="r">£44</td><td class="r">£59</td><td class="r">£83</td><td class="r">11.3%</td><td class="r">4.8%</td></tr>
+    <tr><td>2025 Q2</td><td class="r">6,107</td><td class="r">£39</td><td class="r">£50</td><td class="r">£79</td><td class="r">9.9%</td><td class="r">2.8%</td></tr>
+    <tr><td>2025 Q3</td><td class="r">4,561</td><td class="r">£38</td><td class="r">£55</td><td class="r">—</td><td class="r">15.4%</td><td class="r">—</td></tr>
+    <tr><td>2025 Q4</td><td class="r">4,208</td><td class="r">£40</td><td class="r">£58</td><td class="r">—</td><td class="r">16.0%</td><td class="r">—</td></tr>
+    <tr><td>2026 Q1</td><td class="r">4,431</td><td class="r">£38</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+  </table>
+  <p>Cohorts grew ~3.5× (1,758 → 6,107/quarter) while 365-day LTV per acquired customer fell from ~£104 to ~£80, and 3-month activity compressed from ~17% to ~10%. The topline grows; mature per-customer value is sliding. Recent quarters' 365-day and 12-month cells are still maturing (blank, not zero).</p>
+  <p class="cap">Every acquisition quarter now shown (previously a 6-quarter subset). LTV = cumulative net revenue per acquired customer, computed on the full 142,568-order history and validated against each cohort's actual per-customer spend (2022 Q4 = 3.11 orders × £34 AOV ≈ £104); immature 365-day and 12-month cells left blank.</p>
+
+  <h2>Three-quarters of every cohort lapses within a quarter, and no flow works the gap</h2>
+  <table class="heat">
+    <tr><th>Acq. cohort</th><th>Size</th><th>Q0</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Q5</th><th>Q6</th><th>Q7</th><th>Q8</th></tr>
+    <tr><td class="ch">2022 Q4</td><td class="sz">1,758</td><td style="background:rgba(251,92,109,0.96);color:#fff">100</td><td style="background:rgba(251,92,109,0.651);color:#fff">29.9</td><td style="background:rgba(251,92,109,0.461);color:var(--ink,#1a1a1a)">20.6</td><td style="background:rgba(251,92,109,0.392);color:var(--ink,#1a1a1a)">17.2</td><td style="background:rgba(251,92,109,0.355);color:var(--ink,#1a1a1a)">15.4</td><td style="background:rgba(251,92,109,0.265);color:var(--ink,#1a1a1a)">11</td><td style="background:rgba(251,92,109,0.193);color:var(--ink,#1a1a1a)">7.5</td><td style="background:rgba(251,92,109,0.163);color:var(--ink,#1a1a1a)">6</td><td style="background:rgba(251,92,109,0.134);color:var(--ink,#1a1a1a)">4.6</td></tr>
+    <tr><td class="ch">2023 Q1</td><td class="sz">1,978</td><td style="background:rgba(251,92,109,0.96);color:#fff">100</td><td style="background:rgba(251,92,109,0.711);color:#fff">32.8</td><td style="background:rgba(251,92,109,0.451);color:var(--ink,#1a1a1a)">20.1</td><td style="background:rgba(251,92,109,0.341);color:var(--ink,#1a1a1a)">14.7</td><td style="background:rgba(251,92,109,0.275);color:var(--ink,#1a1a1a)">11.5</td><td style="background:rgba(251,92,109,0.181);color:var(--ink,#1a1a1a)">6.9</td><td style="background:rgba(251,92,109,0.161);color:var(--ink,#1a1a1a)">5.9</td><td style="background:rgba(251,92,109,0.136);color:var(--ink,#1a1a1a)">4.7</td><td style="background:rgba(251,92,109,0.144);color:var(--ink,#1a1a1a)">5.1</td></tr>
+    <tr><td class="ch">2023 Q2</td><td class="sz">1,778</td><td style="background:rgba(251,92,109,0.96);color:#fff">100</td><td style="background:rgba(251,92,109,0.614);color:#fff">28.1</td><td style="background:rgba(251,92,109,0.388);color:var(--ink,#1a1a1a)">17</td><td style="background:rgba(251,92,109,0.273);color:var(--ink,#1a1a1a)">11.4</td><td style="background:rgba(251,92,109,0.191);color:var(--ink,#1a1a1a)">7.4</td><td style="background:rgba(251,92,109,0.175);color:var(--ink,#1a1a1a)">6.6</td><td style="background:rgba(251,92,109,0.159);color:var(--ink,#1a1a1a)">5.8</td><td style="background:rgba(251,92,109,0.134);color:var(--ink,#1a1a1a)">4.6</td><td style="background:rgba(251,92,109,0.142);color:var(--ink,#1a1a1a)">5</td></tr>
+    <tr><td class="ch">2023 Q3</td><td class="sz">2,717</td><td style="background:rgba(251,92,109,0.96);color:#fff">100</td><td style="background:rgba(251,92,109,0.59);color:#fff">26.9</td><td style="background:rgba(251,92,109,0.369);color:var(--ink,#1a1a1a)">16.1</td><td style="background:rgba(251,92,109,0.236);color:var(--ink,#1a1a1a)">9.6</td><td style="background:rgba(251,92,109,0.191);color:var(--ink,#1a1a1a)">7.4</td><td style="background:rgba(251,92,109,0.159);color:var(--ink,#1a1a1a)">5.8</td><td style="background:rgba(251,92,109,0.157);color:var(--ink,#1a1a1a)">5.7</td><td style="background:rgba(251,92,109,0.167);color:var(--ink,#1a1a1a)">6.2</td><td style="background:rgba(251,92,109,0.142);color:var(--ink,#1a1a1a)">5</td></tr>
+    <tr><td class="ch">2023 Q4</td><td class="sz">2,941</td><td style="background:rgba(251,92,109,0.96);color:#fff">100</td><td style="background:rgba(251,92,109,0.488);color:var(--ink,#1a1a1a)">21.9</td><td style="background:rgba(251,92,109,0.257);color:var(--ink,#1a1a1a)">10.6</td><td style="background:rgba(251,92,109,0.222);color:var(--ink,#1a1a1a)">8.9</td><td style="background:rgba(251,92,109,0.183);color:var(--ink,#1a1a1a)">7</td><td style="background:rgba(251,92,109,0.161);color:var(--ink,#1a1a1a)">5.9</td><td style="background:rgba(251,92,109,0.177);color:var(--ink,#1a1a1a)">6.7</td><td style="background:rgba(251,92,109,0.132);color:var(--ink,#1a1a1a)">4.5</td><td style="background:rgba(251,92,109,0.134);color:var(--ink,#1a1a1a)">4.6</td></tr>
+    <tr><td class="ch">2024 Q1</td><td class="sz">3,008</td><td style="background:rgba(251,92,109,0.96);color:#fff">100</td><td style="background:rgba(251,92,109,0.394);color:var(--ink,#1a1a1a)">17.3</td><td style="background:rgba(251,92,109,0.271);color:var(--ink,#1a1a1a)">11.3</td><td style="background:rgba(251,92,109,0.202);color:var(--ink,#1a1a1a)">7.9</td><td style="background:rgba(251,92,109,0.197);color:var(--ink,#1a1a1a)">7.7</td><td style="background:rgba(251,92,109,0.202);color:var(--ink,#1a1a1a)">7.9</td><td style="background:rgba(251,92,109,0.144);color:var(--ink,#1a1a1a)">5.1</td><td style="background:rgba(251,92,109,0.134);color:var(--ink,#1a1a1a)">4.6</td><td style="background:rgba(251,92,109,0.132);color:var(--ink,#1a1a1a)">4.5</td></tr>
+    <tr><td class="ch">2024 Q2</td><td class="sz">1,838</td><td style="background:rgba(251,92,109,0.96);color:#fff">100</td><td style="background:rgba(251,92,109,0.539);color:var(--ink,#1a1a1a)">24.4</td><td style="background:rgba(251,92,109,0.3);color:var(--ink,#1a1a1a)">12.7</td><td style="background:rgba(251,92,109,0.253);color:var(--ink,#1a1a1a)">10.4</td><td style="background:rgba(251,92,109,0.23);color:var(--ink,#1a1a1a)">9.3</td><td style="background:rgba(251,92,109,0.187);color:var(--ink,#1a1a1a)">7.2</td><td style="background:rgba(251,92,109,0.179);color:var(--ink,#1a1a1a)">6.8</td><td style="background:rgba(251,92,109,0.163);color:var(--ink,#1a1a1a)">6</td><td style="background:rgba(251,92,109,0.118);color:var(--ink,#1a1a1a)">3.8</td></tr>
+    <tr><td class="ch">2024 Q3</td><td class="sz">3,748</td><td style="background:rgba(251,92,109,0.96);color:#fff">100</td><td style="background:rgba(251,92,109,0.486);color:var(--ink,#1a1a1a)">21.8</td><td style="background:rgba(251,92,109,0.318);color:var(--ink,#1a1a1a)">13.6</td><td style="background:rgba(251,92,109,0.287);color:var(--ink,#1a1a1a)">12.1</td><td style="background:rgba(251,92,109,0.214);color:var(--ink,#1a1a1a)">8.5</td><td style="background:rgba(251,92,109,0.197);color:var(--ink,#1a1a1a)">7.7</td><td style="background:rgba(251,92,109,0.177);color:var(--ink,#1a1a1a)">6.7</td><td style="background:rgba(251,92,109,0.14);color:var(--ink,#1a1a1a)">4.9</td><td></td></tr>
+    <tr><td class="ch">2024 Q4</td><td class="sz">3,280</td><td style="background:rgba(251,92,109,0.96);color:#fff">100</td><td style="background:rgba(251,92,109,0.439);color:var(--ink,#1a1a1a)">19.5</td><td style="background:rgba(251,92,109,0.304);color:var(--ink,#1a1a1a)">12.9</td><td style="background:rgba(251,92,109,0.22);color:var(--ink,#1a1a1a)">8.8</td><td style="background:rgba(251,92,109,0.199);color:var(--ink,#1a1a1a)">7.8</td><td style="background:rgba(251,92,109,0.163);color:var(--ink,#1a1a1a)">6</td><td style="background:rgba(251,92,109,0.132);color:var(--ink,#1a1a1a)">4.5</td><td></td><td></td></tr>
+    <tr><td class="ch">2025 Q1</td><td class="sz">4,181</td><td style="background:rgba(251,92,109,0.96);color:#fff">100</td><td style="background:rgba(251,92,109,0.541);color:var(--ink,#1a1a1a)">24.5</td><td style="background:rgba(251,92,109,0.275);color:var(--ink,#1a1a1a)">11.5</td><td style="background:rgba(251,92,109,0.234);color:var(--ink,#1a1a1a)">9.5</td><td style="background:rgba(251,92,109,0.206);color:var(--ink,#1a1a1a)">8.1</td><td style="background:rgba(251,92,109,0.152);color:var(--ink,#1a1a1a)">5.5</td><td></td><td></td><td></td></tr>
+    <tr><td class="ch">2025 Q2</td><td class="sz">6,107</td><td style="background:rgba(251,92,109,0.96);color:#fff">100</td><td style="background:rgba(251,92,109,0.445);color:var(--ink,#1a1a1a)">19.8</td><td style="background:rgba(251,92,109,0.314);color:var(--ink,#1a1a1a)">13.4</td><td style="background:rgba(251,92,109,0.255);color:var(--ink,#1a1a1a)">10.5</td><td style="background:rgba(251,92,109,0.177);color:var(--ink,#1a1a1a)">6.7</td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="ch">2025 Q3</td><td class="sz">4,561</td><td style="background:rgba(251,92,109,0.96);color:#fff">100</td><td style="background:rgba(251,92,109,0.606);color:#fff">27.7</td><td style="background:rgba(251,92,109,0.406);color:var(--ink,#1a1a1a)">17.9</td><td style="background:rgba(251,92,109,0.265);color:var(--ink,#1a1a1a)">11</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="ch">2025 Q4</td><td class="sz">4,208</td><td style="background:rgba(251,92,109,0.96);color:#fff">100</td><td style="background:rgba(251,92,109,0.659);color:#fff">30.3</td><td style="background:rgba(251,92,109,0.355);color:var(--ink,#1a1a1a)">15.4</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="ch">2026 Q1</td><td class="sz">4,431</td><td style="background:rgba(251,92,109,0.96);color:#fff">100</td><td style="background:rgba(251,92,109,0.516);color:var(--ink,#1a1a1a)">23.3</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="ch">2026 Q2</td><td class="sz">3,319</td><td style="background:rgba(251,92,109,0.96);color:#fff">100</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
+  <p class="cap">Staggered cohort retention: each row is an acquisition quarter; <b>Q0</b> = the acquisition quarter itself (100% by definition), <b>QN</b> = the share of that cohort placing &ge;1 order N quarters later. Cells shaded by retention. Quarters beyond Q8 flatten at ~4&ndash;5% and are omitted for width; newer cohorts have fewer observed quarters (the stagger). 50,265 customers / 142,568 orders, Klaviyo order history, read 2026-06-03.</p>
+  <p>Read each row left-to-right and the curve is identical every cohort: about <b class="n">three-quarters lapse within one quarter</b> (Q1 retains only ~20&ndash;30%), the curve decays through year one (~7&ndash;15% by Q4), then settles into a flat <b class="n">~4&ndash;5% tail</b> that keeps buying sporadically for years. That tail is <b>unaided reactivation</b>: no winback or replenishment flow fires into the &gt;90-day gap between orders. Read <i>down</i> any column (Q1, Q2&hellip;) and the cohorts are not improving: 2025 acquisition retains about the same as 2023. The lever is a flow that works the lapse window, not more acquisition.
+
+
+  <h2>Acquisition: which products start customers, and whether they return</h2>
+  <table>
+    <tr><th>First-purchase category</th><th class="r">First-buyers</th><th class="r">Avg first order</th><th class="r">Rebuy same format*</th><th class="r">Top cross-buy&dagger;</th><th class="r">LTV (hist.)</th></tr>
+    <tr><td>2400 Disposable</td><td class="r">12,401</td><td class="r">£35.74</td><td class="r">77%</td><td class="r">Hardware &amp; Kits</td><td class="r">£102</td></tr>
+    <tr><td>SMART 5500 Disposable</td><td class="r">2,278</td><td class="r">£40.52</td><td class="r">61%</td><td class="r">PRO Refill Pods</td><td class="r">£130</td></tr>
+    <tr><td>PRO Refill Pods</td><td class="r">3,158</td><td class="r">£32.93</td><td class="r">95%</td><td class="r">Hardware &amp; Kits</td><td class="r">£101</td></tr>
+    <tr><td>Air Pods</td><td class="r">2,745</td><td class="r">£29.37</td><td class="r">81%</td><td class="r">Hardware &amp; Kits</td><td class="r">—</td></tr>
+    <tr><td>Hardware &amp; Kits</td><td class="r">3,658</td><td class="r">£26.25</td><td class="r">—</td><td class="r">Air Pods</td><td class="r">£77</td></tr>
+  </table>
+  <p class="cap">First-buyers + first-order value: fresh, full history (covers the ~57% of customers whose first order maps to a Format category). *Rebuy-same-format = share of that category's repeat buyers whose 2nd order is the same format. &dagger;Top cross-buy = the single most common <i>different</i> Format these first-buyers also purchase (account product classifier); the catalog is razor-and-blade, so devices (Hardware &amp; Kits) and the Air Pods refill are the hubs. Overall repeat rate is 41%; exact per-category repeat rate is in the dashboard's product-journey view. LTV column from the order-history analysis.</p>
+
+  <h2>What customers reorder: most formats are refill machines</h2>
+  <div class="bar" data-tip="95% of PRO Refill repeat buyers reorder PRO Refill" style="margin-top:16px"><div class="nm">PRO Refill Pods</div><div class="tk"><div class="fl pos" style="width:95%"></div></div><div class="vl">95% rebuy same</div></div>
+  <div class="bar" data-tip="81% of Air Pods repeat buyers reorder Air Pods"><div class="nm">Air Pods</div><div class="tk"><div class="fl pos" style="width:81%"></div></div><div class="vl">81%</div></div>
+  <div class="bar" data-tip="79% of 50:50 E-liquid repeat buyers reorder 50:50"><div class="nm">50:50 E-liquid</div><div class="tk"><div class="fl pos" style="width:79%"></div></div><div class="vl">79%</div></div>
+  <div class="bar" data-tip="77% of 2400 repeat buyers reorder 2400"><div class="nm">2400 Disposable</div><div class="tk"><div class="fl pos" style="width:77%"></div></div><div class="vl">77%</div></div>
+  <div class="bar" data-tip="68% of Nic Salts repeat buyers reorder Nic Salts"><div class="nm">Nic Salts</div><div class="tk"><div class="fl pos" style="width:68%"></div></div><div class="vl">68%</div></div>
+  <div class="bar" data-tip="55% of Hardware repeat buyers buy Air Pods next — the razor/blade cross-sell"><div class="nm">Hardware &amp; Kits → Air Pods</div><div class="tk"><div class="fl sal" style="width:55%"></div></div><div class="vl">55% (cross-sell)</div></div>
+  <p>When customers return, they overwhelmingly rebuy the same format. The exception is the clearest cross-sell in the account: Hardware &amp; Kits buyers do not rebuy hardware, they buy Air Pods. There is also a Bundles → Nic Salts path and in-family movement across the Bar range.</p>
+
+  <!-- ============ PART C ============ -->
+  <div class="part">Part C — What to do</div>
+  <p>Each move joins a retention fact to an email gap. In priority order.</p>
+  <ul>
+    <li class="down"><b>Build a replenishment / winback flow at day 18–21.</b> 41% reorder on a 24–25 day median, most formats are refill machines, ~1,300 customers/quarter reactivate unaided, and no flow fires into that window. Largest lever.</li>
+    <li class="down"><b>Reconnect the post-purchase flow and point it at the real next product.</b> "Recommend More" is built and off. Hardware buyers reorder Air Pods (55%); Bundles buyers reorder Nic Salts. Fix the trigger and merchandise the bought-next product.</li>
+    <li class="down"><b>Acquire on, and welcome with, the higher-value entry products.</b> SMART 5500 (£40.52 first order, £130 historical LTV) and PRO Refill (95% rebuy) start better customers than the cheapest disposable.</li>
+    <li class="down"><b>Deploy the segments that already exist and reduce blanket discounting.</b> Production sends go to a test segment while Repeat Buyers / VIP / Win-Back sit unused. Mail the right recency segments; replace some sale blasts with replenishment reminders.</li>
+    <li class="down"><b>Recover Microsoft and add a second sign-up form</b> before scaling sends, so a growing list isn't sent into a weak inbox from a single capture point.</li>
+  </ul>
+
+  <div class="foot">
+    <b>Basis &amp; method.</b> Reports only what the Klaviyo account and its order data show. Order-level retention computed on the full order history Sep 2022 – Jun 2026 (142,644 orders / 50,153 customers), line-item coverage backfilled to ~100% across the window. Campaign revenue is order-date-bucketed; campaign content from the account's classifier; deliverability, forms and list-growth read live (net subscriber counts from the Subscriber Growth report — raw subscribe/unsubscribe metrics over-count and are not used). Email share is last-touch attribution, a ceiling. Per-domain rates shown are 90-day window engagement (openers/clickers ÷ sends), for cross-domain comparison only; per-send rates and per-category exact repeat rate are Klaviyo UI / dashboard reports. Revenue is top-line, not profit. Historical product-LTV figures are from the order-history analysis.
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var tip=document.createElement('div');
+  Object.assign(tip.style,{position:'fixed',zIndex:'9999',pointerEvents:'none',background:'#15171c',color:'#fff',font:'12px/1.4 Helvetica,Arial,sans-serif',padding:'6px 9px',borderRadius:'6px',boxShadow:'0 2px 12px rgba(0,0,0,.25)',opacity:'0',transition:'opacity .08s',maxWidth:'240px'});
+  document.body.appendChild(tip);
+  function show(e){var t=e.currentTarget.getAttribute('data-tip'); if(!t)return; tip.textContent=t; tip.style.opacity='1'; move(e);}
+  function move(e){var x=e.clientX+14, y=e.clientY+16; if(x>window.innerWidth-250)x=e.clientX-250; tip.style.left=x+'px'; tip.style.top=y+'px';}
+  function hide(){tip.style.opacity='0';}
+  document.querySelectorAll('[data-tip]').forEach(function(el){el.addEventListener('mouseenter',show);el.addEventListener('mousemove',move);el.addEventListener('mouseleave',hide);});
+})();
+</script>
+</body>
+</html>
